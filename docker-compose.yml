@@ -1,0 +1,20 @@
+version: '3.5'
+
+services:
+  od:
+    container_name: digivision-od
+    build:
+      context: .
+      args:
+        VERSION: 0.1.0
+    ports:
+      - "50052:50051"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [ gpu ]
+    volumes:
+      - ./config.yml:/etc/img2vec/config.yml:ro
+      - ./.models/ofa:/root/.cache/ofa
+      - ./bpe:/etc/od/bpe:ro

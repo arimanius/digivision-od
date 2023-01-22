@@ -1,0 +1,10 @@
+fairseq @ git+https://github.com/pytorch/fairseq.git@v0.12.0#egg=fairseq
+grpcio-tools==1.46.5
+pillow
+PyYAML
+numpy
+torch
+torchvision
+opencv-python
+timm
+einops
