@@ -2,4 +2,4 @@
 
 set -e
 
-od run -c /etc/img2vec/config.yml
+od run -c /etc/od/config.yml

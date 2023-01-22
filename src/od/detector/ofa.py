@@ -1,4 +1,6 @@
+import hashlib
 import os
+from functools import lru_cache
 from typing import List, Set, Optional
 
 import torch
@@ -12,7 +14,7 @@ from fairseq.dataclass.utils import convert_namespace_to_omegaconf
 from od.ofa.tasks.mm_tasks.refcoco import RefcocoTask
 from od.util import getLogger
 
-logger = getLogger('clip')
+logger = getLogger(__name__)
 
 OFA_URLS = {
     "base": "https://huggingface.co/OFA-Sys/ofa-base-refcoco-fairseq-version/resolve/main/refcoco_base_best.pt"
@@ -32,6 +34,7 @@ MODELS_DIR = "~/.cache/ofa"
 class OFAVisualGrounding:
 
     @staticmethod
+    @lru_cache(maxsize=8)
     def download(model: str) -> str:
         if model not in OFA_URLS:
             raise ValueError(f"Invalid model {model}, must be one of {list(OFA_URLS.keys())}")
@@ -41,8 +44,16 @@ class OFAVisualGrounding:
         model_path = os.path.join(model_dir, f'{model}.pt')
 
         if not os.path.exists(model_path):
-            logger.info(f"Downloading model {model} from {url} to {model_path}")
+            logger.warn(f"Downloading model {model} from {url} to {model_path}")
             torch.hub.download_url_to_file(url, model_path)
+        else:
+            with open(model_path, 'rb') as f:
+                sha256 = hashlib.sha256(f.read()).hexdigest()
+            if sha256 != OFA_SHA256S[model]:
+                logger.warn(f'Found a different version of {model} at {model_path}, downloading again')
+                torch.hub.download_url_to_file(url, model_path)
+            else:
+                logger.info("Using cached model")
         return model_path
 
     def __get_symbols_to_strip_from_output(self) -> Set[int]:

@@ -3,17 +3,18 @@
 # This source code is licensed under the Apache 2.0 license
 # found in the LICENSE file in the root directory.
 
-import logging
 import re
 import torch.utils.data
 from fairseq.data import FairseqDataset
 import string
 
+from od.util import getLogger
+
 CHINESE_PUNCTUATION = '＂＃＄％＆＇（）＊＋，－／：；＜＝＞＠［＼］＾＿｀｛｜｝～｟｠｢｣､\u3000、〃〈〉《》「」『』【】〔〕〖〗〘〙〚〛〜〝〞〟〰〾〿–—‘’‛“”„‟…‧﹏﹑﹔·！？｡。'
 ENGLISH_PUNCTUATION = string.punctuation
 
 
-logger = logging.getLogger(__name__)
+logger = getLogger(__name__)
 
 
 class OFADataset(FairseqDataset):
@@ -47,24 +48,6 @@ class OFADataset(FairseqDataset):
             s = torch.cat([s, self.eos_item])
         return s
 
-    def pre_question(self, question, max_ques_words=None):
-        question = question.lower().lstrip(",.!?*#:;~").replace('-', ' ').replace('/', ' ')
-
-        question = re.sub(
-            r"\s{2,}",
-            ' ',
-            question,
-        )
-        question = question.rstrip('\n')
-        question = question.strip(' ')
-
-        # truncate question
-        question_words = question.split(' ')
-        if max_ques_words is not None and len(question_words) > max_ques_words:
-            question = ' '.join(question_words[:max_ques_words])
-
-        return question
-
     def pre_caption(self, caption, max_words=None):
         caption = caption.lower().lstrip(",.!?*#:;~").replace('-', ' ').replace('/', ' ').replace('<person>', 'person')
 
@@ -82,14 +65,3 @@ class OFADataset(FairseqDataset):
             caption = ' '.join(caption_words[:max_words])
 
         return caption
-
-    def pre_chinese(self, text, max_words):
-        text = text.lower().replace(CHINESE_PUNCTUATION, " ").replace(ENGLISH_PUNCTUATION, " ")
-        text = re.sub(
-            r"\s{2,}",
-            ' ',
-            text,
-        )
-        text = text.rstrip('\n')
-        text = text.strip(' ')[:max_words]
-        return text

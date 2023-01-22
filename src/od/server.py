@@ -22,6 +22,7 @@ class GracefulKiller:
         signal.signal(signal.SIGTERM, self.__exit_gracefully)
 
     def __exit_gracefully(self, signum, frame):
+        print()
         self.__event.set()
 
     def wait(self):

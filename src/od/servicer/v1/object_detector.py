@@ -19,8 +19,8 @@ class ObjectDetectorService(ObjectDetectorServicer):
             image = pi.open(io.BytesIO(request.image))
             bb = self.__detector.detect(image)
             return BoundingBox(
-                top_left=Position(x=int(bb[0]), y=int(bb[1])),
-                bottom_right=Position(x=int(bb[2]), y=int(bb[3]))
+                top_left=Position(x=max(0, int(bb[0])), y=max(0, int(bb[1]))),
+                bottom_right=Position(x=min(image.width, int(bb[2])), y=min(image.height, int(bb[3]))),
             )
         except PIL.UnidentifiedImageError as e:
             context.abort(grpc.StatusCode.INVALID_ARGUMENT, f'invalid image type: {e}')

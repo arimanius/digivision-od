@@ -15,6 +15,6 @@ services:
           devices:
             - capabilities: [ gpu ]
     volumes:
-      - ./config.yml:/etc/img2vec/config.yml:ro
+      - ./config.yml:/etc/od/config.yml:ro
       - ./.models/ofa:/root/.cache/ofa
       - ./bpe:/etc/od/bpe:ro

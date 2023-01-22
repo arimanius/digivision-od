@@ -77,16 +77,6 @@ class FileDataset:
         fp.seek(self.lineid_to_offset[self.start_pos])
         return fp
 
-    def _seek(self, offset=0):
-        try:
-            print("slice_id {} seek offset {}".format(self.slice_id, self.start_pos + offset))
-            self._reader.seek(self.lineid_to_offset[self.start_pos + offset])
-            self.data_cnt = offset
-        except Exception:
-            print("slice_id {} seek offset {}".format(self.slice_id, offset))
-            self._reader.seek(self.lineid_to_offset[offset])
-            self.data_cnt = offset
-
     def __del__(self):
         self._reader.close()
 

@@ -34,6 +34,7 @@ def drop_path(x, drop_prob: float = 0.0, training: bool = False):
     output = x.div(keep_prob) * random_tensor
     return output
 
+
 def init_bert_weights(module):
     """Initialize the weights."""
     if isinstance(module, (nn.Linear, nn.Embedding)):
