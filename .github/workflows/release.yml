@@ -1,0 +1,65 @@
+---
+name: Release a new version
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_level:
+        type: choice
+        description: 'Release increment level.'
+        options:
+          - 'v_patch'
+          - 'v_minor'
+          - 'v_major'
+        required: true
+        default: 'v_patch'
+
+jobs:
+  get_version:
+    runs-on: ubuntu-latest
+
+    outputs:
+      version: ${{ steps.semvers.outputs[github.event.inputs.release_level] }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: 'Get Previous tag'
+        id: previoustag
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+        with:
+          fallback: v0.0.0
+
+      - name: Get next ${{ github.event.inputs.release_level }} version
+        id: semvers
+        uses: "WyriHaximus/github-action-next-semvers@v1"
+        with:
+          version: ${{ steps.previoustag.outputs.tag }}
+
+  release:
+    needs: [get_version]
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Create and Push tag
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git tag ${{ needs.get_version.outputs.version }}
+          git push origin --tags
+
+      - name: Create a GitHub release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ needs.get_version.outputs.version }}
+          release_name: Release ${{ needs.get_version.outputs.version }}

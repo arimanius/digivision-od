@@ -13,7 +13,7 @@ RUN pip install -r requirements.txt
 # Copy source code
 COPY src .
 
-ARG VERSION=local
+ARG VERSION=v0.0.0
 ENV VERSION=${VERSION}
 ENV REQUIREMENTS_FILE=requirements.txt
 RUN pip install -e .
