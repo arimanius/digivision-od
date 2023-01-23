@@ -4,7 +4,7 @@ pillow
 PyYAML
 numpy
 torch
-torchvision
+torchvision>=0.14.1
 opencv-python
 timm
 einops
