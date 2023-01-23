@@ -2,7 +2,7 @@ version: '3.5'
 
 services:
   od:
-    container_name: digivision-od
+    container_name: ghcr.io/arimanius/digivision-od
     build:
       context: .
       args:
